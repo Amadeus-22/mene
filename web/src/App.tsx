@@ -19,6 +19,7 @@ import {
 import { QuotaChart } from "./QuotaChart";
 import { AppBar } from "./AppBar";
 import { LogoMark } from "./Logo";
+import { Datasets, Methodology } from "./InfoPages";
 import { RealFund } from "./RealFund";
 
 type Tab = "indicadores" | "carteira" | "conciliacao" | "periodicos";
@@ -93,6 +94,8 @@ export function App() {
         {route === "home" && <Home fund={fund} days={days} />}
         {route === "funds" && <FundList fund={fund} days={days} />}
         {route === "real" && <RealFund slug={realSlug()} />}
+        {route === "datasets" && <Datasets />}
+        {route === "methodology" && <Methodology />}
         {route === "fund" && (
           <>
             {fund && (
@@ -468,13 +471,15 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-type Route = "home" | "funds" | "fund" | "real";
+type Route = "home" | "funds" | "fund" | "real" | "datasets" | "methodology";
 
 function routeFromHash(): Route {
   const path = window.location.hash.replace(/^#/, "").split("?")[0];
   if (path === "/" || path === "") return "fund";
   if (path === "/inicio") return "home";
   if (path === "/fundos") return "funds";
+  if (path === "/datasets") return "datasets";
+  if (path === "/metodologia") return "methodology";
   if (path.startsWith("/fundos/real/")) return "real";
   return "fund";
 }
@@ -522,8 +527,13 @@ function useRoute(): Route {
 function Crumbs({ route }: { route: Route }) {
   const items: { label: string; href: string; here: boolean }[] = [
     { label: "Início", href: "#/inicio", here: route === "home" },
-    { label: "Fundos", href: "#/fundos", here: route === "funds" },
   ];
+  if (route === "datasets")
+    items.push({ label: "Datasets", href: "#/datasets", here: true });
+  else if (route === "methodology")
+    items.push({ label: "Metodologia", href: "#/metodologia", here: true });
+  else
+    items.push({ label: "Fundos", href: "#/fundos", here: route === "funds" });
   if (route === "fund")
     items.push({
       label: "Detalhes do fundo",

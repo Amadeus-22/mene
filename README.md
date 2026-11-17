@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.svg" width="96" alt="Emaús logo: a road converging on the horizon at sunrise">
+  <img src="docs/logo.svg" width="96" alt="Emaús logo: a road rising to the sun, flat geometry with a shaded facet">
 </p>
 
 <h1 align="center">Emaús</h1>
@@ -155,8 +155,9 @@ administrator's file is the engine's own result with two planted breaks:
 
 React + TypeScript, no UI library. A fund page in the style of public fund
 portals: a full-width header with the logo on the left and the menus on the right
-(Fundos, Dados de mercado, Datasets with links to the CVM, B3 and Banco Central
-sources, Metodologia), a drawer menu on phones, breadcrumbs (Início,
+(Fundos, Dados de mercado, Datasets, Metodologia). Datasets and Metodologia are
+pages of the app: each source with its file, frequency and use, and the mirror
+quota method as numbered steps. A drawer menu on phones, breadcrumbs (Início,
 Fundos, fund) and links that open
 a tab on a given day (`#/fundos/demo?aba=conciliacao&dia=2026-03-10`). Light and
 dark themes follow the system. Breakpoints at 1360, 860, 600 and 380 px: the

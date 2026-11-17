@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 
-const REPO = "https://github.com/Amadeus-22/emaus";
-
 type Item = { label: string; href: string; external?: boolean; hint?: string };
 type Menu = { label: string; items: Item[] };
 
@@ -37,23 +35,19 @@ const MENUS: Menu[] = [
     items: [
       {
         label: "CVM · Carteira (CDA)",
-        href: "https://dados.cvm.gov.br/dataset/fi-doc-cda",
-        external: true,
+        href: "#/datasets?fonte=cvm-cda",
       },
       {
         label: "CVM · Informe diário",
-        href: "https://dados.cvm.gov.br/dataset/fi-doc-inf_diario",
-        external: true,
+        href: "#/datasets?fonte=cvm-informe",
       },
       {
         label: "B3 · Cotações históricas",
-        href: "https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/historico/mercado-a-vista/cotacoes-historicas/",
-        external: true,
+        href: "#/datasets?fonte=b3-cotahist",
       },
       {
         label: "Banco Central · CDI (SGS 12)",
-        href: "https://dadosabertos.bcb.gov.br/dataset/12-taxa-de-juros---cdi",
-        external: true,
+        href: "#/datasets?fonte=bcb-cdi",
       },
     ],
   },
@@ -174,9 +168,8 @@ export function AppBar({ route }: { route: string }) {
           ))}
           <a
             className="navlink"
-            href={`${REPO}#mirror-quota-of-a-real-fund`}
-            target="_blank"
-            rel="noreferrer"
+            href="#/metodologia"
+            aria-current={route === "methodology" ? "page" : undefined}
           >
             Metodologia
           </a>
