@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 from cota import ledger
@@ -50,3 +51,14 @@ def test_api_returns_decimals_as_strings() -> None:
     assert isinstance(body["net_asset_value"], str)
     assert client.get("/api/reconciliation/2026-03-10").json()["matched"] is False
     assert client.get("/api/portfolio/2027-01-01").status_code == 404
+
+
+def test_real_endpoints_404_without_an_extract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import cota.api as api_module
+
+    monkeypatch.setattr(api_module, "REAL_DIR", tmp_path)
+    api_module._mirror.cache_clear()
+    client = TestClient(app)
+    assert client.get("/api/real").json() == {"funds": []}
+    assert client.get("/api/real/nope").status_code == 404
+    assert client.get("/api/real/..%2f..").status_code == 404

@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup check test lint web web-test run dev demo-data
+.PHONY: setup check test lint web web-test run dev demo-data real
 
 setup: ## virtualenv with dev tools, and the web app's packages
 	python3 -m venv .venv && $(PY) -m pip install -q -e '.[dev]'
@@ -28,3 +28,6 @@ dev: ## API on :8000; run `cd web && npm run dev` for the app on :5173
 
 demo-data: ## regenerate data/demo
 	$(PY) scripts/make_demo.py
+
+real: ## download CVM, B3 and BCB open data and build the mirror-quota extract (~150 MB cached)
+	$(PY) scripts/fetch_real.py

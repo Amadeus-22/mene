@@ -8,8 +8,8 @@ describe("format", () => {
     expect(formatDecimal("12345678901234567890.12")).toBe("12.345.678.901.234.567.890,12");
   });
   it("keeps the sign and pads to fixed places", () => {
-    expect(formatMoney("-0.5")).toBe("R$ -0,50");
-    expect(formatMoney("950")).toBe("R$ 950,00");
+    expect(formatMoney("-0.5")).toBe("R$\u00a0-0,50");
+    expect(formatMoney("950")).toBe("R$\u00a0950,00");
   });
   it("drops trailing zeros from quantities", () => {
     expect(formatQuantity("16000.00000000")).toBe("16.000");

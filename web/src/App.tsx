@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { api, type Day, type Fund, type Portfolio, type Reconciliation } from "./api";
+import { api, realApi, type Day, type Fund, type Portfolio, type RealSummary, type Reconciliation } from "./api";
 import { formatDate, formatDecimal, formatMoney, formatQuantity, itemLabel, sign } from "./format";
 import { QuotaChart } from "./QuotaChart";
+import { RealFund } from "./RealFund";
 
 type Tab = "indicadores" | "carteira" | "conciliacao" | "periodicos";
 
@@ -62,6 +63,7 @@ export function App() {
 
       {route === "home" && <Home fund={fund} days={days} />}
       {route === "funds" && <FundList fund={fund} days={days} />}
+      {route === "real" && <RealFund slug={realSlug()} />}
       {route === "fund" && (
         <>
 
@@ -279,7 +281,11 @@ export function App() {
         </>
       )}
 
-      <footer className="disclaimer">Fundo fictício para demonstração. Tickers, preços e prestadores não são reais.</footer>
+      <footer className="disclaimer">
+        {route === "real"
+          ? "Dados públicos da CVM, da B3 e do Banco Central. A cota espelho é uma estimativa independente, não a cota oficial do fundo."
+          : "O fundo demo é fictício: tickers, preços e prestadores não são reais. Os fundos marcados como dados reais usam dados públicos da CVM, da B3 e do Banco Central."}
+      </footer>
     </div>
   );
 }
@@ -308,14 +314,27 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-type Route = "home" | "funds" | "fund";
+type Route = "home" | "funds" | "fund" | "real";
 
 function routeFromHash(): Route {
   const path = window.location.hash.replace(/^#/, "").split("?")[0];
   if (path === "/" || path === "") return "fund";
   if (path === "/inicio") return "home";
   if (path === "/fundos") return "funds";
+  if (path.startsWith("/fundos/real/")) return "real";
   return "fund";
+}
+
+function realSlug(): string {
+  return decodeURIComponent(window.location.hash.replace(/^#\/fundos\/real\//, "").split("?")[0]);
+}
+
+function useRealFunds(): RealSummary[] {
+  const [funds, setFunds] = useState<RealSummary[]>([]);
+  useEffect(() => {
+    realApi.list().then((r) => setFunds(r.funds), () => setFunds([]));
+  }, []);
+  return funds;
 }
 
 function useRoute(): Route {
@@ -337,6 +356,7 @@ function Crumbs({ route }: { route: Route }) {
     { label: "Fundos", href: "#/fundos", here: route === "funds" },
   ];
   if (route === "fund") items.push({ label: "Detalhes do fundo", href: "#/fundos/demo", here: true });
+  if (route === "real") items.push({ label: "Detalhes do fundo", href: window.location.hash, here: true });
   return (
     <nav className="crumbs" aria-label="Navegação">
       {items.map((it, i) => (
@@ -350,6 +370,7 @@ function Crumbs({ route }: { route: Route }) {
 }
 
 function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
+  const real = useRealFunds();
   const last = days.at(-1);
   const breaks = days.filter((d) => !d.reconciled);
   return (
@@ -364,9 +385,16 @@ function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
       <div className="home-grid">
         <a className="home-card" href="#/fundos">
           <span className="kpi-label">Fundos</span>
-          <span className="kpi-value">1 fundo</span>
-          <span className="kpi-sub">{fund?.name ?? "carregando…"}</span>
+          <span className="kpi-value">{1 + real.length} fundo(s)</span>
+          <span className="kpi-sub">{[fund?.name, ...real.map((r) => r.name)].filter(Boolean).join(" · ")}</span>
         </a>
+        {real.map((r) => (
+          <a key={r.slug} className="home-card" href={`#/fundos/real/${r.slug}`}>
+            <span className="kpi-label">Cota espelho · dados reais</span>
+            <span className="kpi-value">{r.gap_bps === null ? "—" : `${formatDecimal(r.gap_bps)} bps`}</span>
+            <span className="kpi-sub">{r.name}, em {r.last_date ? formatDate(r.last_date) : "—"}</span>
+          </a>
+        ))}
         {last && (
           <a className="home-card" href="#/fundos/demo?aba=indicadores">
             <span className="kpi-label">Última cota</span>
@@ -385,6 +413,7 @@ function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
 }
 
 function FundList({ fund, days }: { fund?: Fund; days: Day[] }) {
+  const real = useRealFunds();
   const last = days.at(-1);
   if (!fund || !last) return <p className="muted">Carregando…</p>;
   const breaks = days.filter((d) => !d.reconciled).length;
@@ -417,6 +446,22 @@ function FundList({ fund, days }: { fund?: Fund; days: Day[] }) {
                 <span className={breaks ? "chip chip-break" : "chip chip-ok"}>{breaks ? `${breaks} dia(s) com divergência` : "conciliado"}</span>
               </td>
             </tr>
+            {real.map((r) => (
+              <tr key={r.slug} className="clickable" onClick={() => (window.location.hash = `#/fundos/real/${r.slug}`)}>
+                <td className="ticker">
+                  <a href={`#/fundos/real/${r.slug}`}>{r.name}</a> <span className="chip chip-ok">dados reais</span>
+                </td>
+                <td>Ações indexado</td>
+                <td className="num">{r.net_asset_value === null ? "—" : formatMoney(r.net_asset_value)}</td>
+                <td className="num">{r.official_quota === null ? "—" : formatDecimal(r.official_quota, 6)}</td>
+                <td className="num">{r.gap_bps === null ? "—" : `espelho ${formatDecimal(r.gap_bps)} bps`}</td>
+                <td>
+                  <span className={r.flagged_days ? "chip chip-break" : "chip chip-ok"}>
+                    {r.flagged_days ? `${r.flagged_days} salto(s) a explicar` : "sem saltos"}
+                  </span>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

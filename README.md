@@ -1,11 +1,57 @@
 # cota
 
-The daily back-office loop of an investment fund, small enough to read in one
-sitting: replay trades, corporate events and investor flows, mark the portfolio
-to market, compute the net asset value and the **quota** (the fund's unit price),
-then **reconcile** every figure with the fund administrator and explain each
-break. Python with exact `Decimal` arithmetic, a FastAPI service and a React +
-TypeScript screen.
+The daily back office of an investment fund in Python with exact `Decimal`
+arithmetic, a FastAPI service and a React + TypeScript screen. It does two things:
+
+1. **Mirror quota of a real fund.** From public data only (CVM, B3, Banco
+   Central), it rebuilds the daily quota of *CAIXA Brasil Indexa Ibovespa* and
+   compares it with the official quota the administrator published. In October
+   2026 the mirror stayed within 1 basis point of the official quota until an
+   ex-dividend day, and every gap is explained on screen.
+2. **Fund ledger with reconciliation**, on a fictional fund: trades, splits,
+   dividends and investor flows replayed day by day, quota computed, and every
+   figure reconciled with an administrator file that has two planted breaks.
+
+![Real fund: official quota from the CVM against our mirror quota built from the disclosed portfolio and B3 closes, within a few basis points all month](docs/mirror.png)
+
+## Mirror quota of a real fund
+
+[`cota/mirror.py`](cota/mirror.py), data from
+[`scripts/fetch_real.py`](scripts/fetch_real.py) (`make real`):
+
+| Input | Source |
+|---|---|
+| Portfolio on 30/09/2026: 78 stocks with quantity and market value, and the PL | CVM CDA (`cda_fi_BLC_4`, `cda_fi_PL`) |
+| Official daily quota, PL, subscriptions, redemptions, holders | CVM informe diário |
+| Daily close of each stock | B3 COTAHIST |
+| Daily CDI | Banco Central SGS 12 |
+
+How it reasons, in order:
+
+1. **Check the pipeline before trusting it.** On the portfolio date, quantity ×
+   B3 close must equal the market value the administrator reported, stock by
+   stock. It does, to the cent: R$ 299,852,513.91 on both sides.
+2. **Rebuild the quota.** Hold the disclosed portfolio, price it at each day's
+   close, grow the non-stock part (cash, receivables, payables) at the CDI, and
+   divide by the shares outstanding implied on the portfolio date (PL ÷ quota).
+   Investor flows do not move the quota of an index fund that invests them pro
+   rata, so they need no modelling.
+3. **Explain the gap, do not hide it.** The gap stayed between −0.6 and +0.1 bps
+   for nine days. On 14/10 it jumped by −7.6 bps in one day and stayed there:
+   the pattern of an ex-dividend/JCP date, when the price drops and the fund
+   books a receivable the public portfolio does not show. Jumps above 3 bps are
+   flagged with that reading and the stocks that moved the portfolio most.
+
+![Daily gap table: within one basis point until 14/10, then a −7.6 bps step flagged as a likely ex-dividend date](docs/mirror-gap.png)
+
+What the mirror cannot see, and so where the remaining gap comes from: trades
+after the portfolio date (the index rebalances), receivables from dividends,
+and the fund's fees. A longer run would separate the fee as a steady daily drift.
+
+The extract is not committed: run `make real` (≈150 MB of public files, cached
+in `~/.cache/cota/raw`), then `make run` and open **Fundos**.
+
+## Fund ledger with reconciliation (demo fund)
 
 ![Fund page: PL, quota, daily and accumulated return, the fund's structure, and the quota's accumulated return chart with a hover tooltip](docs/overview.png)
 
@@ -75,18 +121,22 @@ Needs Python 3.11+ and Node 20+.
 ```sh
 make setup      # .venv with dev tools, web packages
 make check      # ruff, mypy --strict, pytest, vitest
+make real       # optional: public data for the mirror quota (~150 MB)
 make run        # API and the built app on http://127.0.0.1:8000
 ```
 
 For development, `make dev` serves the API on :8000 and `cd web && npm run dev`
 serves the app on :5173 with `/api` proxied.
 
-API: `GET /api/fund`, `GET /api/days`, `GET /api/portfolio/{date}`, `GET /api/reconciliation/{date}`.
+API: `GET /api/real`, `GET /api/real/{slug}`, `GET /api/fund`, `GET /api/days`, `GET /api/portfolio/{date}`, `GET /api/reconciliation/{date}`.
 Point `COTA_DATA_DIR` at another folder with the same five CSV files and a `fund.json` to run your
 own data.
 
 ## Tests
 
+- [`tests/test_mirror.py`](tests/test_mirror.py): the B3 fixed-width parser,
+  SGS dates, the pipeline check, the mirror quota against hand-computed values,
+  a missing close, cash growing at the CDI, and the jump explanation.
 - [`tests/test_ledger.py`](tests/test_ledger.py): hand-computed cases for average
   cost with fees, quota truncation, realized profit, splits keeping the value,
   dividends moving value from stock to cash, flows converting at the day's quota,

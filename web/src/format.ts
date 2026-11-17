@@ -12,7 +12,7 @@ export function formatDecimal(value: string, places?: number): string {
 }
 
 export function formatMoney(value: string): string {
-  return `R$ ${formatDecimal(value, 2)}`;
+  return `R$\u00a0${formatDecimal(value, 2)}`; // no-break space keeps "R$" with the number
 }
 
 export function formatQuantity(value: string): string {

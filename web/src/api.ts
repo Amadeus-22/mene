@@ -71,3 +71,48 @@ export const api = {
   portfolio: (day: string) => get<Portfolio>(`/api/portfolio/${day}`),
   reconciliation: (day: string) => get<Reconciliation>(`/api/reconciliation/${day}`),
 };
+
+export interface RealSummary {
+  slug: string;
+  name: string;
+  cnpj: string;
+  last_date: string | null;
+  official_quota: string | null;
+  net_asset_value: string | null;
+  gap_bps: string | null;
+  flagged_days: number;
+}
+
+export interface MirrorDay {
+  date: string;
+  official_quota: string;
+  our_quota: string;
+  official_return_pct: string;
+  our_return_pct: string;
+  gap_bps: string;
+  gap_change_bps: string | null;
+  net_asset_value: string;
+  subscriptions: string;
+  redemptions: string;
+  holders: number;
+  stale: string[];
+  flagged: boolean;
+  explanation: string | null;
+  movers: { ticker: string; return_pct: string; contribution_bps: string }[];
+}
+
+export interface RealFund {
+  info: { name: string; cnpj: string; portfolio_date: string; sources: Record<string, string>; fetched: string };
+  start: string;
+  start_nav: string;
+  shares: string;
+  other_assets: string;
+  check: { stocks: number; ours: string; administrator: string; mismatches: { ticker: string; difference: string | null }[] };
+  holdings: { ticker: string; quantity: string; close: string | null; market_value: string; weight_pct: string }[];
+  days: MirrorDay[];
+}
+
+export const realApi = {
+  list: () => get<{ funds: RealSummary[] }>("/api/real"),
+  fund: (slug: string) => get<RealFund>(`/api/real/${encodeURIComponent(slug)}`),
+};

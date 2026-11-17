@@ -14,13 +14,14 @@ from typing import Any
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 
-from . import ledger
+from . import ledger, mirror
 from .data import FundData, load
 from .model import FlowKind, Snapshot, money
 from .reconcile import reconcile
 
 DATA_DIR = Path(os.environ.get("COTA_DATA_DIR", Path(__file__).resolve().parent.parent / "data" / "demo"))
 WEB_DIR = os.environ.get("COTA_WEB_DIR")
+REAL_DIR = Path(os.environ.get("COTA_REAL_DIR", Path(__file__).resolve().parent.parent / "data" / "real"))
 
 app = FastAPI(title="cota", version="0.1.0")
 
@@ -123,6 +124,95 @@ def reconciliation(day: date) -> dict[str, Any]:
             for line in report.lines
         ],
         "causes": list(report.causes),
+    }
+
+
+@lru_cache(maxsize=8)
+def _mirror(slug: str) -> tuple[dict[str, object], mirror.Mirror]:
+    directory = REAL_DIR / slug
+    if not slug.replace("-", "").isalnum() or not (directory / "fund.json").exists():
+        raise HTTPException(404, f"no extract for {slug}; run scripts/fetch_real.py")
+    return mirror.load(directory)
+
+
+@app.get("/api/real")
+def real_funds() -> dict[str, Any]:
+    funds = []
+    for d in sorted(REAL_DIR.glob("*/fund.json")) if REAL_DIR.exists() else []:
+        info, m = _mirror(d.parent.name)
+        last = m.days[-1] if m.days else None
+        funds.append(
+            {
+                "slug": d.parent.name,
+                "name": info["name"],
+                "cnpj": info["cnpj"],
+                "last_date": None if last is None else last.day.isoformat(),
+                "official_quota": None if last is None else _s(last.official_quota),
+                "net_asset_value": None if last is None else _s(last.official_nav),
+                "gap_bps": None if last is None else _s(last.gap_bps),
+                "flagged_days": sum(1 for x in m.days if x.flagged),
+            }
+        )
+    return {"funds": funds}
+
+
+@app.get("/api/real/{slug}")
+def real_fund(slug: str) -> dict[str, Any]:
+    info, m = _mirror(slug)
+    first = m.days[0].official_quota if m.days else None
+    return {
+        "info": info,
+        "start": m.start.isoformat(),
+        "start_nav": _s(money(m.start_nav)),
+        "shares": _s(m.shares.quantize(Decimal("0.01"))),
+        "other_assets": _s(m.other_assets),
+        "check": {
+            "stocks": len(m.checks),
+            "ours": _s(m.stock_value_ours),
+            "administrator": _s(m.stock_value_administrator),
+            "mismatches": [
+                {"ticker": c.ticker, "difference": _s(c.difference)}
+                for c in m.checks
+                if c.difference is None or c.difference != 0
+            ],
+        },
+        "holdings": [
+            {
+                "ticker": c.ticker,
+                "quantity": _s(c.quantity),
+                "close": _s(c.close),
+                "market_value": _s(c.administrator),
+                "weight_pct": f"{c.administrator / m.start_nav * 100:.2f}",
+            }
+            for c in sorted(m.checks, key=lambda c: c.administrator, reverse=True)
+        ],
+        "days": [
+            {
+                "date": d.day.isoformat(),
+                "official_quota": _s(d.official_quota),
+                "our_quota": _s(d.our_quota),
+                "official_return_pct": None if first is None else f"{(d.official_quota / first - 1) * 100:.4f}",
+                "our_return_pct": None if first is None else f"{(d.our_quota / first - 1) * 100:.4f}",
+                "gap_bps": _s(d.gap_bps),
+                "gap_change_bps": _s(d.gap_change_bps),
+                "net_asset_value": _s(d.official_nav),
+                "subscriptions": _s(d.subscriptions),
+                "redemptions": _s(d.redemptions),
+                "holders": d.holders,
+                "stale": list(d.stale),
+                "flagged": d.flagged,
+                "explanation": d.explanation,
+                "movers": [
+                    {
+                        "ticker": x.ticker,
+                        "return_pct": f"{x.return_pct:.2f}",
+                        "contribution_bps": f"{x.contribution_bps:.2f}",
+                    }
+                    for x in d.movers
+                ],
+            }
+            for d in m.days
+        ],
     }
 
 
