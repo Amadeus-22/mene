@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 
 from .model import CorporateEvent, EventKind, Snapshot, br, br_date
 
@@ -27,7 +27,7 @@ class AdminFigure:
     value: Decimal
 
 
-class Status(str, Enum):
+class Status(StrEnum):
     MATCH = "match"
     BREAK = "break"
     MISSING = "missing"  # one side has the item, the other does not

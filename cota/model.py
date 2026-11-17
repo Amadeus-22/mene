@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import ROUND_DOWN, ROUND_HALF_EVEN, Decimal
-from enum import Enum
+from enum import StrEnum
 
 CENT = Decimal("0.01")
 QUOTA_PLACES = Decimal("0.00000001")  # 8 decimal places
@@ -31,17 +31,17 @@ def truncate_shares(value: Decimal) -> Decimal:
     return value.quantize(SHARE_PLACES, rounding=ROUND_DOWN)
 
 
-class Side(str, Enum):
+class Side(StrEnum):
     BUY = "BUY"
     SELL = "SELL"
 
 
-class EventKind(str, Enum):
+class EventKind(StrEnum):
     SPLIT = "SPLIT"  # value = new shares per old share (2 means 1 becomes 2)
     DIVIDEND = "DIVIDEND"  # value = cash per share, credited on the ex-date
 
 
-class FlowKind(str, Enum):
+class FlowKind(StrEnum):
     SUBSCRIPTION = "SUBSCRIPTION"  # aplicação
     REDEMPTION = "REDEMPTION"  # resgate
 
