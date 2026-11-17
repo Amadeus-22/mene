@@ -62,7 +62,7 @@ export function Datasets() {
         <span className="eyebrow">Datasets</span>
         <h1>Fontes de dados</h1>
         <p className="muted">
-          Tudo o que o Emaús usa é dado público e oficial. Os arquivos são
+          Tudo o que o Mene usa é dado público e oficial. Os arquivos são
           baixados com <code>make real</code>, guardados em cache e lidos direto
           para <code>Decimal</code>, sem passar por ponto flutuante.
         </p>

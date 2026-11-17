@@ -572,7 +572,7 @@ function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
         <div className="hero">
           <LogoMark size={64} />
           <div>
-            <h1 className="hero-title">Emaús</h1>
+            <h1 className="hero-title">Mene</h1>
             <p className="hero-sub">Back office de fundos</p>
           </div>
         </div>

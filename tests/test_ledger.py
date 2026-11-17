@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import pytest
 
-from emaus import ledger
-from emaus.model import CorporateEvent, EventKind, Flow, FlowKind, Price, Side, Trade, money, truncate_quota
+from mene import ledger
+from mene.model import CorporateEvent, EventKind, Flow, FlowKind, Price, Side, Trade, money, truncate_quota
 
 D1, D2, D3, D4 = date(2026, 3, 2), date(2026, 3, 3), date(2026, 3, 4), date(2026, 3, 5)
 X = Decimal
@@ -104,7 +104,7 @@ def test_money_rounds_half_to_even() -> None:
 
 
 def test_messages_use_brazilian_notation() -> None:
-    from emaus.model import br
+    from mene.model import br
 
     assert br(X("1234567.89")) == "1.234.567,89"
     assert br(X("-0.85")) == "-0,85"

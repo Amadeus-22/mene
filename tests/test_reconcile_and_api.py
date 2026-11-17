@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from emaus import ledger
-from emaus.api import app
-from emaus.data import load
-from emaus.reconcile import AdminFigure, Status, reconcile
+from mene import ledger
+from mene.api import app
+from mene.data import load
+from mene.reconcile import AdminFigure, Status, reconcile
 
 DEMO = load(Path(__file__).resolve().parent.parent / "data" / "demo")
 RUN = ledger.run(DEMO.trades, DEMO.prices, DEMO.events, DEMO.flows)
@@ -46,7 +46,7 @@ def test_api_returns_decimals_as_strings() -> None:
     assert days[0]["return_pct"] == "0.0000"
     assert days[0]["subscriptions"] == "1000000.00"
     assert next(d for d in days if d["date"] == "2026-03-09")["redemptions"] == "50000.00"
-    assert client.get("/api/fund").json()["name"] == "Emaús Demo FIA"
+    assert client.get("/api/fund").json()["name"] == "Mene Demo FIA"
     body = client.get("/api/portfolio/2026-03-13").json()
     assert isinstance(body["net_asset_value"], str)
     assert client.get("/api/reconciliation/2026-03-10").json()["matched"] is False
@@ -56,7 +56,7 @@ def test_api_returns_decimals_as_strings() -> None:
 
 
 def test_real_endpoints_404_without_an_extract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    import emaus.api as api_module
+    import mene.api as api_module
 
     monkeypatch.setattr(api_module, "REAL_DIR", tmp_path)
     api_module._mirror.cache_clear()

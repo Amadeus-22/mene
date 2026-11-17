@@ -87,7 +87,7 @@ export function AppBar({ route }: { route: string }) {
   return (
     <header className="appbar" ref={ref}>
       <div className="appbar-inner">
-        <a className="brand" href="#/inicio" aria-label="Emaús, início">
+        <a className="brand" href="#/inicio" aria-label="Mene, início">
           <Logo size={34} />
         </a>
 

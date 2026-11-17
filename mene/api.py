@@ -19,11 +19,11 @@ from .data import FundData, load
 from .model import FlowKind, Snapshot, money
 from .reconcile import reconcile
 
-DATA_DIR = Path(os.environ.get("EMAUS_DATA_DIR", Path(__file__).resolve().parent.parent / "data" / "demo"))
-WEB_DIR = os.environ.get("EMAUS_WEB_DIR")
-REAL_DIR = Path(os.environ.get("EMAUS_REAL_DIR", Path(__file__).resolve().parent.parent / "data" / "real"))
+DATA_DIR = Path(os.environ.get("MENE_DATA_DIR", Path(__file__).resolve().parent.parent / "data" / "demo"))
+WEB_DIR = os.environ.get("MENE_WEB_DIR")
+REAL_DIR = Path(os.environ.get("MENE_REAL_DIR", Path(__file__).resolve().parent.parent / "data" / "real"))
 
-app = FastAPI(title="Emaús", version="0.2.0")
+app = FastAPI(title="Mene", version="0.2.0")
 
 
 @lru_cache(maxsize=1)

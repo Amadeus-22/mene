@@ -21,10 +21,10 @@ web: ## build web/dist
 	cd web && npm run build
 
 run: web ## API and the built app on http://127.0.0.1:8000
-	EMAUS_WEB_DIR=web/dist $(PY) -m uvicorn emaus.api:app --port 8000
+	MENE_WEB_DIR=web/dist $(PY) -m uvicorn mene.api:app --port 8000
 
 dev: ## API on :8000; run `cd web && npm run dev` for the app on :5173
-	$(PY) -m uvicorn emaus.api:app --port 8000 --reload
+	$(PY) -m uvicorn mene.api:app --port 8000 --reload
 
 demo-data: ## regenerate data/demo
 	$(PY) scripts/make_demo.py

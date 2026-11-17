@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from emaus import ledger  # noqa: E402
-from emaus.model import (  # noqa: E402
+from mene import ledger  # noqa: E402
+from mene.model import (  # noqa: E402
     CorporateEvent,
     EventKind,
     Flow,

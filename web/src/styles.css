@@ -763,7 +763,12 @@ tbody tr:hover td {
   display: grid;
   line-height: 1.05;
 }
-.logo-word { font-size: 21px; font-weight: 900; letter-spacing: 0.02em; color: var(--text); }
+.logo-word {
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
 .logo-tag {
   font-size: 10.5px;
   letter-spacing: 0.06em;
@@ -776,7 +781,13 @@ tbody tr:hover td {
   gap: var(--space-4);
   margin-bottom: var(--space-2);
 }
-.hero-title { margin: 0; font-size: clamp(30px, 4.4vw, 44px); font-weight: 900; letter-spacing: 0.02em; color: var(--text); }
+.hero-title {
+  margin: 0;
+  font-size: clamp(30px, 4.4vw, 44px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
 .hero-sub {
   margin: 2px 0 0;
   font-size: 13px;
