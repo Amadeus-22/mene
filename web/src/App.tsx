@@ -20,6 +20,14 @@ export function App() {
   const [portfolio, setPortfolio] = useState<Portfolio>();
   const [recon, setRecon] = useState<Reconciliation>();
   const [error, setError] = useState<string>();
+  const route = useRoute();
+
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("aba");
+    if (wanted && TABS.some((t) => t.id === wanted)) setTab(wanted as Tab);
+    const day = new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("dia");
+    if (day) setSelected(day);
+  }, [route]);
 
   useEffect(() => {
     Promise.all([api.fund(), api.days()]).then(
@@ -48,15 +56,14 @@ export function App() {
 
   return (
     <div className="page">
-      <nav className="crumbs" aria-label="Navegação">
-        <span>Início</span>
-        <span>›</span>
-        <span>Fundos</span>
-        <span>›</span>
-        <strong>Detalhes do fundo</strong>
-      </nav>
+      <Crumbs route={route} />
 
       {error && <div className="error">{error}</div>}
+
+      {route === "home" && <Home fund={fund} days={days} />}
+      {route === "funds" && <FundList fund={fund} days={days} />}
+      {route === "fund" && (
+        <>
 
       {fund && (
         <header className="fund-head">
@@ -269,6 +276,9 @@ export function App() {
         </section>
       )}
 
+        </>
+      )}
+
       <footer className="disclaimer">Fundo fictício para demonstração. Tickers, preços e prestadores não são reais.</footer>
     </div>
   );
@@ -295,5 +305,121 @@ function Field({ label, value }: { label: string; value: string }) {
       <span className="field-label">{label}</span>
       <span>{value}</span>
     </div>
+  );
+}
+
+type Route = "home" | "funds" | "fund";
+
+function routeFromHash(): Route {
+  const path = window.location.hash.replace(/^#/, "").split("?")[0];
+  if (path === "/" || path === "") return "fund";
+  if (path === "/inicio") return "home";
+  if (path === "/fundos") return "funds";
+  return "fund";
+}
+
+function useRoute(): Route {
+  const [route, setRoute] = useState<Route>(routeFromHash);
+  useEffect(() => {
+    const onChange = () => {
+      setRoute(routeFromHash());
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  }, []);
+  return route;
+}
+
+function Crumbs({ route }: { route: Route }) {
+  const items: { label: string; href: string; here: boolean }[] = [
+    { label: "Início", href: "#/inicio", here: route === "home" },
+    { label: "Fundos", href: "#/fundos", here: route === "funds" },
+  ];
+  if (route === "fund") items.push({ label: "Detalhes do fundo", href: "#/fundos/demo", here: true });
+  return (
+    <nav className="crumbs" aria-label="Navegação">
+      {items.map((it, i) => (
+        <span key={it.href} className="crumb">
+          {i > 0 && <span aria-hidden="true">›</span>}
+          {it.here ? <strong aria-current="page">{it.label}</strong> : <a href={it.href}>{it.label}</a>}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
+  const last = days.at(-1);
+  const breaks = days.filter((d) => !d.reconciled);
+  return (
+    <section className="home">
+      <div className="fund-title">
+        <span className="eyebrow">cota</span>
+        <h1>Back office de fundos</h1>
+        <p className="muted">
+          Carteira, cota diária e conciliação com o administrador. Escolha por onde começar.
+        </p>
+      </div>
+      <div className="home-grid">
+        <a className="home-card" href="#/fundos">
+          <span className="kpi-label">Fundos</span>
+          <span className="kpi-value">1 fundo</span>
+          <span className="kpi-sub">{fund?.name ?? "carregando…"}</span>
+        </a>
+        {last && (
+          <a className="home-card" href="#/fundos/demo?aba=indicadores">
+            <span className="kpi-label">Última cota</span>
+            <span className="kpi-value">{formatDecimal(last.quota)}</span>
+            <span className="kpi-sub">{formatDate(last.date)}</span>
+          </a>
+        )}
+        <a className={breaks.length ? "home-card warn" : "home-card"} href={breaks.length ? `#/fundos/demo?aba=conciliacao&dia=${breaks[0].date}` : "#/fundos/demo?aba=conciliacao"}>
+          <span className="kpi-label">Divergências com o administrador</span>
+          <span className={`kpi-value ${breaks.length ? "down" : "up"}`}>{breaks.length ? `${breaks.length} dia(s)` : "nenhuma"}</span>
+          <span className="kpi-sub">{breaks.length ? `abrir ${formatDate(breaks[0].date)}` : "tudo conciliado"}</span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function FundList({ fund, days }: { fund?: Fund; days: Day[] }) {
+  const last = days.at(-1);
+  if (!fund || !last) return <p className="muted">Carregando…</p>;
+  const breaks = days.filter((d) => !d.reconciled).length;
+  return (
+    <section className="tab-body">
+      <h2>Fundos</h2>
+      <p className="muted">Clique em um fundo para ver os detalhes.</p>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fundo</th>
+              <th>Categoria</th>
+              <th className="num">Patrimônio líquido</th>
+              <th className="num">Valor da cota</th>
+              <th className="num">Rentabilidade acumulada</th>
+              <th>Conciliação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="clickable" onClick={() => (window.location.hash = "#/fundos/demo")}>
+              <td className="ticker">
+                <a href="#/fundos/demo">{fund.name}</a>
+              </td>
+              <td>{fund.tags[0]}</td>
+              <td className="num">{formatMoney(last.closing_net_asset_value)}</td>
+              <td className="num">{formatDecimal(last.quota)}</td>
+              <td className={`num ${sign(last.return_pct)}`}>{formatDecimal(last.return_pct, 2)}%</td>
+              <td>
+                <span className={breaks ? "chip chip-break" : "chip chip-ok"}>{breaks ? `${breaks} dia(s) com divergência` : "conciliado"}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
