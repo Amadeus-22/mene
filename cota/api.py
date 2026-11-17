@@ -33,7 +33,8 @@ def _fund() -> tuple[FundData, dict[date, Snapshot]]:
 
 
 def _s(value: Decimal | None) -> str | None:
-    return None if value is None else str(value)
+    """Plain notation: str(Decimal("0E-8")) would print the exponent."""
+    return None if value is None else format(value, "f")
 
 
 def _snapshot(day: date) -> Snapshot:

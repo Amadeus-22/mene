@@ -7,7 +7,8 @@ export function formatDecimal(value: string, places?: number): string {
   const [int, frac = ""] = (negative ? value.slice(1) : value).split(".");
   const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   let decimals = frac;
-  if (places !== undefined) decimals = frac.padEnd(places, "0").slice(0, places);
+  if (places !== undefined)
+    decimals = frac.padEnd(places, "0").slice(0, places);
   return `${negative ? "-" : ""}${grouped}${decimals ? `,${decimals}` : ""}`;
 }
 
@@ -16,7 +17,9 @@ export function formatMoney(value: string): string {
 }
 
 export function formatQuantity(value: string): string {
-  const trimmed = value.includes(".") ? value.replace(/0+$/, "").replace(/\.$/, "") : value;
+  const trimmed = value.includes(".")
+    ? value.replace(/0+$/, "").replace(/\.$/, "")
+    : value;
   return formatDecimal(trimmed || "0");
 }
 

@@ -50,6 +50,8 @@ def test_api_returns_decimals_as_strings() -> None:
     body = client.get("/api/portfolio/2026-03-13").json()
     assert isinstance(body["net_asset_value"], str)
     assert client.get("/api/reconciliation/2026-03-10").json()["matched"] is False
+    quota_line = client.get("/api/reconciliation/2026-03-13").json()["lines"][0]
+    assert quota_line["difference"] == "0.00000000"  # never "0E-8"
     assert client.get("/api/portfolio/2027-01-01").status_code == 404
 
 

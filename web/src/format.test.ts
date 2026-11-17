@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDecimal, formatMoney, formatQuantity, itemLabel, sign } from "./format";
+import {
+  formatDate,
+  formatDecimal,
+  formatMoney,
+  formatQuantity,
+  itemLabel,
+  sign,
+} from "./format";
 
 describe("format", () => {
   it("groups thousands and uses a decimal comma without float rounding", () => {
     expect(formatDecimal("1091688.79")).toBe("1.091.688,79");
     expect(formatDecimal("1.02053713")).toBe("1,02053713");
-    expect(formatDecimal("12345678901234567890.12")).toBe("12.345.678.901.234.567.890,12");
+    expect(formatDecimal("12345678901234567890.12")).toBe(
+      "12.345.678.901.234.567.890,12",
+    );
   });
   it("keeps the sign and pads to fixed places", () => {
     expect(formatMoney("-0.5")).toBe("R$\u00a0-0,50");

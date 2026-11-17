@@ -28,6 +28,23 @@ arithmetic, a FastAPI service and a React + TypeScript screen. It does two thing
 
 How it reasons, in order:
 
+```mermaid
+flowchart TD
+    CDA["CVM CDA<br/>portfolio on 30/09: 78 stocks + PL"] --> CHECK
+    B3["B3 COTAHIST<br/>daily closes"] --> CHECK
+    CHECK{"quantity × close<br/>= administrator's value<br/>for every stock?"}
+    CHECK -- "no" --> STOP["stop: the pipeline is wrong"]
+    CHECK -- "yes, to the cent" --> SHARES["shares = PL ÷ official quota<br/>other assets = PL − stocks"]
+    SHARES --> DAY["each day: stocks at the close<br/>+ other assets grown at the CDI"]
+    CDI["Banco Central SGS 12<br/>daily CDI"] --> DAY
+    DAY --> QUOTA["mirror quota = value ÷ shares<br/>(8 places, truncated)"]
+    INF["CVM informe diário<br/>official quota"] --> GAP
+    QUOTA --> GAP["gap in basis points"]
+    GAP --> JUMP{"gap moved<br/>more than 3 bps today?"}
+    JUMP -- "no" --> NEXT["next day"]
+    JUMP -- "yes" --> FLAG["flag with the likely cause<br/>and the day's top contributors"]
+```
+
 1. **Check the pipeline before trusting it.** On the portfolio date, quantity ×
    B3 close must equal the market value the administrator reported, stock by
    stock. It does, to the cent: R$ 299,852,513.91 on both sides.
@@ -71,9 +88,21 @@ quota is published: a split one side missed, a price that never arrived, a trade
 booked twice. This project models that loop end to end and makes the explanation
 part of the output, not something done by hand in a spreadsheet.
 
-## What it does
+## Ledger: order of operations
 
 Each day, in this order (see [`cota/ledger.py`](cota/ledger.py)):
+
+```mermaid
+flowchart LR
+    E["corporate events<br/>(split, dividend)"] --> T["trades<br/>(average cost, realized P&L)"]
+    T --> M["mark to market<br/>(stale close flagged)"]
+    M --> PL["PL before flows"]
+    PL --> Q["quota = PL ÷ shares<br/>(8 places, truncated)"]
+    Q --> F["subscriptions and redemptions<br/>converted at that quota"]
+    F --> R{"reconcile with<br/>the administrator"}
+    R -- "match" --> OK["day closed"]
+    R -- "break" --> WHY["name the cause and<br/>which side fixes it"]
+```
 
 1. **Corporate events** with that ex-date: a split multiplies the quantity and
    divides the average cost; a dividend credits cash.
@@ -113,6 +142,18 @@ administrator's file is the engine's own result with two planted breaks:
 | 12/03/2026 | Quota and PL differ, positions match | GAMA3 close missing on our side, marked at the day before |
 
 ![Carteira tab on 12/03/2026 in dark mode: GAMA3 is tagged with a stale price](docs/stale-price-dark.png)
+
+## The screen
+
+React + TypeScript, no UI library. A fund page in the style of public fund
+portals with an app bar, breadcrumbs (Início, Fundos, fund) and links that open
+a tab on a given day (`#/fundos/demo?aba=conciliacao&dia=2026-03-10`). Light and
+dark themes follow the system. Breakpoints at 1360, 860, 600 and 380 px: the
+headline figures go from six columns to three and then two, the structure panels
+stack, tables scroll sideways with the first column pinned, and charts keep a
+readable width.
+
+<img src="docs/mobile.png" width="300" alt="The real fund on a 390 px wide phone: app bar, title, headline figures in two columns">
 
 ## Run it
 
