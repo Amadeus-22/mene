@@ -34,7 +34,7 @@
   --space-5: 24px;
   --space-6: 32px;
   --gutter: 24px;
-  --appbar-h: 56px;
+  --appbar-h: 68px;
 
   color-scheme: light;
   font-family:
@@ -118,50 +118,6 @@ a {
 }
 
 /* ---------- App bar ---------- */
-.appbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: saturate(1.4) blur(8px);
-  border-bottom: 1px solid var(--border);
-}
-.appbar-inner {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-  height: var(--appbar-h);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-.brand {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  text-decoration: none;
-  color: var(--text);
-}
-.appnav {
-  display: flex;
-  gap: var(--space-1);
-}
-.appnav a {
-  padding: 6px 12px;
-  border-radius: 999px;
-  color: var(--muted);
-  text-decoration: none;
-  font-weight: 500;
-}
-.appnav a:hover {
-  color: var(--text);
-  background: var(--box);
-}
-.appnav a[aria-current="page"] {
-  color: var(--accent);
-  background: var(--accent-soft);
-}
 
 /* ---------- Page ---------- */
 .page {
@@ -717,7 +673,7 @@ tbody tr:hover td {
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
-    --appbar-h: 52px;
+    --appbar-h: 58px;
     font-size: 13.5px;
   }
   .page {
@@ -774,9 +730,6 @@ tbody tr:hover td {
   .legend {
     font-size: 12px;
     gap: var(--space-3);
-  }
-  .appnav a {
-    padding: 6px 10px;
   }
 }
 
@@ -844,5 +797,182 @@ tbody tr:hover td {
 @media (max-width: 860px) {
   .logo-tag {
     display: none;
+  }
+}
+
+/* ---------- App bar (full width, like a site header) ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.appbar-inner {
+  height: var(--appbar-h);
+  padding: 0 clamp(16px, 3vw, 48px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text);
+  flex: none;
+}
+.mainnav {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1.4vw, 20px);
+}
+.navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.navlink:hover,
+.navlink[aria-expanded="true"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.navlink[aria-current="page"] {
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+  border-radius: 0;
+}
+.caret {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition: transform 0.15s;
+}
+.navlink[aria-expanded="true"] .caret {
+  transform: rotate(180deg);
+}
+.navmenu {
+  position: relative;
+}
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 280px;
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.dropdown a {
+  display: grid;
+  gap: 1px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.dropdown a:hover {
+  background: var(--select);
+  color: var(--accent);
+}
+.dropdown small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.navicon {
+  display: inline-flex;
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--text);
+}
+.navicon svg {
+  fill: currentColor;
+}
+.navicon:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.menu-toggle {
+  display: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 7px;
+  color: var(--text);
+  cursor: pointer;
+}
+.menu-toggle svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+@media (max-width: 960px) {
+  .menu-toggle {
+    display: inline-flex;
+  }
+  .mainnav {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--appbar-h);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--space-2) clamp(16px, 3vw, 48px) var(--space-4);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+  }
+  .mainnav.open {
+    display: flex;
+  }
+  .navlink {
+    justify-content: space-between;
+    padding: 12px 8px;
+    border-radius: var(--radius);
+  }
+  .navlink[aria-current="page"] {
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .dropdown {
+    position: static;
+    min-width: 0;
+    box-shadow: none;
+    border: 0;
+    padding: 0 0 6px 12px;
+  }
+  .navicon {
+    align-self: flex-start;
   }
 }

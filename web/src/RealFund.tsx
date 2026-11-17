@@ -24,6 +24,18 @@ export function RealFund({ slug }: { slug: string }) {
   const [tab, setTab] = useState<Tab>("espelho");
 
   useEffect(() => {
+    const pick = () => {
+      const wanted = new URLSearchParams(
+        window.location.hash.split("?")[1] ?? "",
+      ).get("aba");
+      if (wanted && TABS.some((t) => t.id === wanted)) setTab(wanted as Tab);
+    };
+    pick();
+    window.addEventListener("hashchange", pick);
+    return () => window.removeEventListener("hashchange", pick);
+  }, []);
+
+  useEffect(() => {
     realApi.fund(slug).then(setData, (e: Error) => setError(e.message));
   }, [slug]);
 

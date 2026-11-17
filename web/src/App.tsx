@@ -17,7 +17,8 @@ import {
   sign,
 } from "./format";
 import { QuotaChart } from "./QuotaChart";
-import { Logo, LogoMark } from "./Logo";
+import { AppBar } from "./AppBar";
+import { LogoMark } from "./Logo";
 import { RealFund } from "./RealFund";
 
 type Tab = "indicadores" | "carteira" | "conciliacao" | "periodicos";
@@ -38,6 +39,7 @@ export function App() {
   const [recon, setRecon] = useState<Reconciliation>();
   const [error, setError] = useState<string>();
   const route = useRoute();
+  const hash = useHash();
 
   useEffect(() => {
     const wanted = new URLSearchParams(
@@ -48,7 +50,7 @@ export function App() {
       window.location.hash.split("?")[1] ?? "",
     ).get("dia");
     if (day) setSelected(day);
-  }, [route]);
+  }, [hash]);
 
   useEffect(() => {
     Promise.all([api.fund(), api.days()]).then(
@@ -82,27 +84,7 @@ export function App() {
 
   return (
     <>
-      <header className="appbar">
-        <div className="appbar-inner">
-          <a className="brand" href="#/inicio">
-            <Logo size={30} />
-          </a>
-          <nav className="appnav" aria-label="Principal">
-            <a
-              href="#/inicio"
-              aria-current={route === "home" ? "page" : undefined}
-            >
-              Início
-            </a>
-            <a
-              href="#/fundos"
-              aria-current={route !== "home" ? "page" : undefined}
-            >
-              Fundos
-            </a>
-          </nav>
-        </div>
-      </header>
+      <AppBar route={route} />
       <div className="page">
         <Crumbs route={route} />
 
@@ -512,6 +494,16 @@ function useRealFunds(): RealSummary[] {
     );
   }, []);
   return funds;
+}
+
+function useHash(): string {
+  const [hash, setHash] = useState(window.location.hash);
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  }, []);
+  return hash;
 }
 
 function useRoute(): Route {
