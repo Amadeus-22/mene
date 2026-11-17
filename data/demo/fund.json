@@ -1,0 +1,11 @@
+{
+  "name": "Cota Demo FIA",
+  "kind": "Classe",
+  "tags": ["Ações", "Fundo de demonstração", "Cota de fechamento"],
+  "administrator": "Administradora Demo S.A. (fictícia)",
+  "manager": "Gestora Demo Ltda. (fictícia)",
+  "custodian": "Custodiante Demo S.A. (fictício)",
+  "quota_rule": "Fechamento, 8 casas truncadas",
+  "subscription_settlement": "D+0 (cota do dia)",
+  "redemption_settlement": "D+0 (cota do dia)"
+}

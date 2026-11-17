@@ -7,7 +7,15 @@ then **reconcile** every figure with the fund administrator and explain each
 break. Python with exact `Decimal` arithmetic, a FastAPI service and a React +
 TypeScript screen.
 
-![Reconciliation on 10/03/2026: our BETA4 position is twice the administrator's, and the screen names the cause, a 2-for-1 split they did not apply](docs/split-break.png)
+![Fund page: PL, quota, daily and accumulated return, the fund's structure, and the quota's accumulated return chart with a hover tooltip](docs/overview.png)
+
+The screen is a fund page in the style of public fund portals: headline figures
+for a reference date, the fund's structure, and four tabs: **Indicadores** (the
+quota's accumulated return; click a day to make it the reference date),
+**Carteira** (positions), **Conciliação** (against the administrator) and
+**Dados periódicos** (daily PL, quota, subscriptions and redemptions).
+
+![Conciliação tab on 10/03/2026: our BETA4 position is twice the administrator's, and the screen names the cause, a 2-for-1 split they did not apply](docs/split-break.png)
 
 ## Why
 
@@ -58,7 +66,7 @@ administrator's file is the engine's own result with two planted breaks:
 | 10/03/2026 | Administrator's BETA4 quantity is half of ours | 2-for-1 split not applied on their side |
 | 12/03/2026 | Quota and PL differ, positions match | GAMA3 close missing on our side, marked at the day before |
 
-![12/03/2026 in dark mode: GAMA3 is tagged with a stale price and the cause says the close is missing on our side](docs/stale-price-dark.png)
+![Carteira tab on 12/03/2026 in dark mode: GAMA3 is tagged with a stale price](docs/stale-price-dark.png)
 
 ## Run it
 
@@ -73,8 +81,8 @@ make run        # API and the built app on http://127.0.0.1:8000
 For development, `make dev` serves the API on :8000 and `cd web && npm run dev`
 serves the app on :5173 with `/api` proxied.
 
-API: `GET /api/days`, `GET /api/portfolio/{date}`, `GET /api/reconciliation/{date}`.
-Point `COTA_DATA_DIR` at another folder with the same five CSV files to run your
+API: `GET /api/fund`, `GET /api/days`, `GET /api/portfolio/{date}`, `GET /api/reconciliation/{date}`.
+Point `COTA_DATA_DIR` at another folder with the same five CSV files and a `fund.json` to run your
 own data.
 
 ## Tests

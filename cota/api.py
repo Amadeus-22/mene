@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import os
+from collections import defaultdict
 from datetime import date
 from decimal import Decimal
 from functools import lru_cache
@@ -14,7 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import ledger
 from .data import FundData, load
-from .model import Snapshot
+from .model import FlowKind, Snapshot, money
 from .reconcile import reconcile
 
 DATA_DIR = Path(os.environ.get("COTA_DATA_DIR", Path(__file__).resolve().parent.parent / "data" / "demo"))
@@ -40,10 +42,20 @@ def _snapshot(day: date) -> Snapshot:
     return snapshots[day]
 
 
+@app.get("/api/fund")
+def fund() -> dict[str, Any]:
+    info: dict[str, Any] = json.loads((DATA_DIR / "fund.json").read_text(encoding="utf-8"))
+    return info
+
+
 @app.get("/api/days")
 def days() -> dict[str, Any]:
     data, snapshots = _fund()
     ordered = sorted(snapshots)
+    first = snapshots[ordered[0]].quota if ordered else Decimal(1)
+    flows: dict[tuple[date, FlowKind], Decimal] = defaultdict(Decimal)
+    for f in data.flows:
+        flows[(f.day, f.kind)] += f.amount
     out = []
     for i, d in enumerate(ordered):
         s = snapshots[d]
@@ -55,6 +67,11 @@ def days() -> dict[str, Any]:
                 "date": d.isoformat(),
                 "quota": _s(s.quota),
                 "change_pct": None if change is None else f"{change:.4f}",
+                "return_pct": f"{(s.quota / first - 1) * 100:.4f}",
+                "net_asset_value": _s(s.net_asset_value),
+                "closing_net_asset_value": _s(s.closing_net_asset_value),
+                "subscriptions": _s(money(flows[(d, FlowKind.SUBSCRIPTION)])),
+                "redemptions": _s(money(flows[(d, FlowKind.REDEMPTION)])),
                 "reconciled": report.matched,
             }
         )

@@ -42,6 +42,10 @@ def test_api_returns_decimals_as_strings() -> None:
     client = TestClient(app)
     days = client.get("/api/days").json()["days"]
     assert days[0]["quota"] == "1.00000000"
+    assert days[0]["return_pct"] == "0.0000"
+    assert days[0]["subscriptions"] == "1000000.00"
+    assert next(d for d in days if d["date"] == "2026-03-09")["redemptions"] == "50000.00"
+    assert client.get("/api/fund").json()["name"] == "Cota Demo FIA"
     body = client.get("/api/portfolio/2026-03-13").json()
     assert isinstance(body["net_asset_value"], str)
     assert client.get("/api/reconciliation/2026-03-10").json()["matched"] is False

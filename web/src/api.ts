@@ -2,7 +2,24 @@ export interface Day {
   date: string;
   quota: string;
   change_pct: string | null;
+  return_pct: string;
+  net_asset_value: string;
+  closing_net_asset_value: string;
+  subscriptions: string;
+  redemptions: string;
   reconciled: boolean;
+}
+
+export interface Fund {
+  name: string;
+  kind: string;
+  tags: string[];
+  administrator: string;
+  manager: string;
+  custodian: string;
+  quota_rule: string;
+  subscription_settlement: string;
+  redemption_settlement: string;
 }
 
 export interface Position {
@@ -49,6 +66,7 @@ async function get<T>(path: string): Promise<T> {
 }
 
 export const api = {
+  fund: () => get<Fund>("/api/fund"),
   days: () => get<{ fund: string; days: Day[] }>("/api/days"),
   portfolio: (day: string) => get<Portfolio>(`/api/portfolio/${day}`),
   reconciliation: (day: string) => get<Reconciliation>(`/api/reconciliation/${day}`),
