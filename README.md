@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.svg" width="96" alt="Mene logo: tally marks being counted beside a lamp, flat geometry">
+  <img src="docs/logo.svg" width="96" alt="Mene logo: an M drawn as a rising price line over volume bars on a violet-to-orange gradient">
 </p>
 
 <h1 align="center">Mene</h1>

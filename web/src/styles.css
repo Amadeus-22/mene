@@ -1093,3 +1093,6 @@ tbody tr:hover td {
     grid-template-columns: 1fr;
   }
 }
+
+/* Brand bar follows the logo gradient */
+.fund-title { border-left: 5px solid transparent; border-image: linear-gradient(180deg, #f97316, #ec4899 50%, #7c3aed) 1; }
