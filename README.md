@@ -156,7 +156,7 @@ administrator's file is the engine's own result with two planted breaks:
 React + TypeScript, no UI library. A fund page in the style of public fund
 portals: a full-width header with the logo on the left and the menus on the right
 (Fundos, Dados de mercado, Datasets with links to the CVM, B3 and Banco Central
-sources, Metodologia, GitHub), a drawer menu on phones, breadcrumbs (Início,
+sources, Metodologia), a drawer menu on phones, breadcrumbs (Início,
 Fundos, fund) and links that open
 a tab on a given day (`#/fundos/demo?aba=conciliacao&dia=2026-03-10`). Light and
 dark themes follow the system. Breakpoints at 1360, 860, 600 and 380 px: the

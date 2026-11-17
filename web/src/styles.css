@@ -906,19 +906,6 @@ tbody tr:hover td {
   font-size: 12px;
   font-weight: 400;
 }
-.navicon {
-  display: inline-flex;
-  padding: 8px;
-  border-radius: 50%;
-  color: var(--text);
-}
-.navicon svg {
-  fill: currentColor;
-}
-.navicon:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
-}
 .menu-toggle {
   display: none;
   border: 1px solid var(--border);
@@ -971,8 +958,5 @@ tbody tr:hover td {
     box-shadow: none;
     border: 0;
     padding: 0 0 6px 12px;
-  }
-  .navicon {
-    align-self: flex-start;
   }
 }
