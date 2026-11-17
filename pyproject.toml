@@ -3,8 +3,8 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cota"
-version = "0.1.0"
+name = "emaus"
+version = "0.2.0"
 description = "Daily portfolio, quota and administrator reconciliation for an investment fund, with exact decimal arithmetic."
 requires-python = ">=3.11"
 license = "MIT"
@@ -14,7 +14,7 @@ dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.34,<1"]
 dev = ["pytest==8.3.4", "httpx==0.28.1", "ruff==0.14.5", "mypy==1.14.1"]
 
 [tool.setuptools]
-packages = ["cota"]
+packages = ["emaus"]
 
 [tool.ruff]
 line-length = 120
@@ -25,7 +25,7 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.mypy]
 strict = true
-files = ["cota", "tests", "scripts"]
+files = ["emaus", "tests", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

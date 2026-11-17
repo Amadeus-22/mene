@@ -143,16 +143,6 @@ a {
   text-decoration: none;
   color: var(--text);
 }
-.brand-mark {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--accent);
-}
-.brand-sub {
-  font-size: 12px;
-  color: var(--muted);
-}
 .appnav {
   display: flex;
   gap: var(--space-1);
@@ -718,7 +708,7 @@ tbody tr:hover td {
     margin-inline: calc(-1 * var(--space-4));
     padding-inline: var(--space-4);
   }
-  .brand-sub {
+  .logo-tag {
     display: none;
   }
 }
@@ -803,5 +793,56 @@ tbody tr:hover td {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+}
+
+/* ---------- Logo ---------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  flex: none;
+  display: block;
+}
+.logo-text {
+  display: grid;
+  line-height: 1.05;
+}
+.logo-word {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.logo-tag {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+.hero-title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.hero-sub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .logo-tag {
+    display: none;
   }
 }

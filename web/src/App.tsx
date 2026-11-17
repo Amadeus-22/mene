@@ -17,6 +17,7 @@ import {
   sign,
 } from "./format";
 import { QuotaChart } from "./QuotaChart";
+import { Logo, LogoMark } from "./Logo";
 import { RealFund } from "./RealFund";
 
 type Tab = "indicadores" | "carteira" | "conciliacao" | "periodicos";
@@ -84,8 +85,7 @@ export function App() {
       <header className="appbar">
         <div className="appbar-inner">
           <a className="brand" href="#/inicio">
-            <span className="brand-mark">cota</span>
-            <span className="brand-sub">back office de fundos</span>
+            <Logo size={30} />
           </a>
           <nav className="appnav" aria-label="Principal">
             <a
@@ -567,11 +567,16 @@ function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
   return (
     <section className="home">
       <div className="fund-title">
-        <span className="eyebrow">cota</span>
-        <h1>Back office de fundos</h1>
+        <div className="hero">
+          <LogoMark size={64} />
+          <div>
+            <h1 className="hero-title">Emaús</h1>
+            <p className="hero-sub">Back office de fundos</p>
+          </div>
+        </div>
         <p className="muted">
-          Carteira, cota diária e conciliação com o administrador. Escolha por
-          onde começar.
+          Carteira, cota diária e conciliação com o administrador, com dados
+          públicos da CVM, da B3 e do Banco Central. Escolha por onde começar.
         </p>
       </div>
       <div className="home-grid">
@@ -601,7 +606,7 @@ function Home({ fund, days }: { fund?: Fund; days: Day[] }) {
         ))}
         {last && (
           <a className="home-card" href="#/fundos/demo?aba=indicadores">
-            <span className="kpi-label">Última cota</span>
+            <span className="kpi-label">Última cota · fundo demo</span>
             <span className="kpi-value">{formatDecimal(last.quota)}</span>
             <span className="kpi-sub">{formatDate(last.date)}</span>
           </a>

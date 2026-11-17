@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from cota import ledger  # noqa: E402
-from cota.model import (  # noqa: E402
+from emaus import ledger  # noqa: E402
+from emaus.model import (  # noqa: E402
     CorporateEvent,
     EventKind,
     Flow,

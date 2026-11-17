@@ -1,4 +1,10 @@
-# cota
+<p align="center">
+  <img src="docs/logo.svg" width="96" alt="Emaús logo: a road converging on the horizon at sunrise">
+</p>
+
+<h1 align="center">Emaús</h1>
+
+<p align="center"><b>Back office de fundos</b> · mirror quota and reconciliation in Python and React</p>
 
 The daily back office of an investment fund in Python with exact `Decimal`
 arithmetic, a FastAPI service and a React + TypeScript screen. It does two things:
@@ -12,11 +18,13 @@ arithmetic, a FastAPI service and a React + TypeScript screen. It does two thing
    dividends and investor flows replayed day by day, quota computed, and every
    figure reconciled with an administrator file that has two planted breaks.
 
+![Home: the Emaús logo, the funds, the real fund's mirror gap and the demo fund's reconciliation breaks](docs/home.png)
+
 ![Real fund: official quota from the CVM against our mirror quota built from the disclosed portfolio and B3 closes, within a few basis points all month](docs/mirror.png)
 
 ## Mirror quota of a real fund
 
-[`cota/mirror.py`](cota/mirror.py), data from
+[`emaus/mirror.py`](emaus/mirror.py), data from
 [`scripts/fetch_real.py`](scripts/fetch_real.py) (`make real`):
 
 | Input | Source |
@@ -66,7 +74,7 @@ after the portfolio date (the index rebalances), receivables from dividends,
 and the fund's fees. A longer run would separate the fee as a steady daily drift.
 
 The extract is not committed: run `make real` (≈150 MB of public files, cached
-in `~/.cache/cota/raw`), then `make run` and open **Fundos**.
+in `~/.cache/emaus/raw`), then `make run` and open **Fundos**.
 
 ## Fund ledger with reconciliation (demo fund)
 
@@ -90,7 +98,7 @@ part of the output, not something done by hand in a spreadsheet.
 
 ## Ledger: order of operations
 
-Each day, in this order (see [`cota/ledger.py`](cota/ledger.py)):
+Each day, in this order (see [`emaus/ledger.py`](emaus/ledger.py)):
 
 ```mermaid
 flowchart LR
@@ -115,7 +123,7 @@ flowchart LR
    quota is 1.
 5. **Subscriptions and redemptions** are converted into shares at that quota.
 
-Then [`cota/reconcile.py`](cota/reconcile.py) compares the quota (tolerance of
+Then [`emaus/reconcile.py`](emaus/reconcile.py) compares the quota (tolerance of
 one unit in the 8th place), the PL (one cent) and every position (exact) with the
 administrator's file, and names the likely cause of each break and which side has
 to fix it.
@@ -170,7 +178,7 @@ For development, `make dev` serves the API on :8000 and `cd web && npm run dev`
 serves the app on :5173 with `/api` proxied.
 
 API: `GET /api/real`, `GET /api/real/{slug}`, `GET /api/fund`, `GET /api/days`, `GET /api/portfolio/{date}`, `GET /api/reconciliation/{date}`.
-Point `COTA_DATA_DIR` at another folder with the same five CSV files and a `fund.json` to run your
+Point `EMAUS_DATA_DIR` at another folder with the same five CSV files and a `fund.json` to run your
 own data.
 
 ## Tests
@@ -201,3 +209,7 @@ would plug in.
 ## License
 
 MIT
+
+The name comes from the road to Emmaus (Luke 24:13-35): two people walk the same
+road and only recognise what they were looking at when it is explained. That is
+the job of a reconciliation.

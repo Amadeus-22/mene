@@ -1,8 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
-from cota import mirror, sources
-from cota.sources import Holding, OfficialDay
+from emaus import mirror, sources
+from emaus.sources import Holding, OfficialDay
 
 X = Decimal
 D0, D1, D2 = date(2026, 9, 30), date(2026, 10, 1), date(2026, 10, 2)

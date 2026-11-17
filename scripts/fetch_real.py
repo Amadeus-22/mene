@@ -1,6 +1,6 @@
 """Downloads the public data for the mirror quota and writes a small extract.
 
-Sources (cached in ~/.cache/cota/raw, ~150 MB on the first run):
+Sources (cached in ~/.cache/emaus/raw, ~150 MB on the first run):
 - CVM CDA for the month before the period: the fund's stocks and PL.
 - CVM informe diário for that month end and the period: the official quota.
 - B3 COTAHIST for the year: daily closes of the fund's stocks.
@@ -26,11 +26,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from cota import sources  # noqa: E402
+from emaus import sources  # noqa: E402
 
-CACHE = Path.home() / ".cache" / "cota" / "raw"
+CACHE = Path.home() / ".cache" / "emaus" / "raw"
 CVM = "https://dados.cvm.gov.br/dados/FI/DOC"
-UA = {"User-Agent": "cota/0.1 (open-data research)"}
+UA = {"User-Agent": "emaus/0.1 (open-data research)"}
 
 
 def download(url: str) -> Path:
